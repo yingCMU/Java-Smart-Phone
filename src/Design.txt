@@ -1,0 +1,9 @@
+Documentation
+¡ð The documentation is well written and clearly explains what the code is accomplishing. Class
+Diagram is provided.
+
+a. Each Automotive model  has a set of OptionSet as properties (Color, Transmission etc.)
+b. Each OptionSet(property) has a set of Options( values and corresponsing price) 
+d. Model also has a price.
+e. class relations We can see that Model will contain OptionSet and Each OptionSet will contain Option class
+option class is inner class of optionset
