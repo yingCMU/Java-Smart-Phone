@@ -10,18 +10,25 @@ class OptionSet implements Serializable{
 	 * 
 	 */
 	private static final long serialVersionUID = 3202608254778286360L;
-	private  ArrayList<Option> opts ;
+	private  Option[] opts ;
+	
 	//private  Option[] opts;
 	private String name;
+	private int nextBucket=0;
 	private final int DEFAULT_SIZE= 1;
-	
+	private void init(){
+		for(int i=0;i<opts.length;i++)
+		opts[i] = new Option();
+	}
 	protected OptionSet(String name, int optssize){
-		setOpts(new  ArrayList<Option>(optssize)); 
+		opts = new Option[optssize];
+		init();
 		setName(name);
 	}
 	protected OptionSet(){
-		setOpts(new  ArrayList<Option>(DEFAULT_SIZE)); 
-		setName("no_name_given");
+		/*opts = new Option[DEFAULT_SIZE]; 
+		init();
+		setName("no_name_given");*/
 	}
 	protected void print() {
         System.out.println("Option :"+ name);
@@ -31,7 +38,7 @@ class OptionSet implements Serializable{
     }
 	 protected void updateOpt(int i, String name, int price) {
 	        try{
-	            opts.set(i, new Option(name, price));
+	            opts[i] = new Option(name, price);
 	        } 
 	        catch (Exception e){
 	        	e.printStackTrace();
@@ -46,27 +53,51 @@ class OptionSet implements Serializable{
 	    */
 	    protected void deleteOpt(int i){
 	        try{
-	            opts.remove(i);
+	        	optsRemove(i);
 	        } 
 	        catch (Exception e){
 	        	e.printStackTrace();
 	            System.err.printf("Error: %s", e);
 	        }
 	    }
+	    private void optsRemove(int index){
+	    	Option[] n = new Option[opts.length - 1];
+	        System.arraycopy(opts, index+1, n, index, opts.length - index-1);
+	        System.out.println("%%%%% removed ");
+	        opts=n;
+	        for(Option a:opts)	
+	        	System.out.println(a.toString());
+		        
+	    }
 	    protected void setOpt(int i, String name, int price) 
 	    {
-	        opts.set(i, new Option(name, price));
+	        opts[i]= new Option(name, price);
 	    }
 	    
-	    protected void addOpt(String name, int price)
+	    protected void putOpt(String name, int price)
 	    {
-	        opts.add(new Option(name, price));
+	    	Option[] n = new Option[opts.length + 1];
+	    	System.arraycopy(opts, 0, n, 0, opts.length );
+	    	n[opts.length]=(new Option(name, price));
 	    }
-	protected ArrayList<Option> getOpts() {
+	    protected void addOpt(String name, int price)
+	    {	System.out.println("--before addOpt next bucket is "+nextBucket);
+	    System.out.println("opts.length->"+opts.length);
+	    	if(nextBucket>=opts.length){
+	    	Option[] n = new Option[opts.length +1];
+	    	System.arraycopy(opts, 0, n, 0, opts.length );
+	    	n[opts.length]=(new Option(name, price));
+	    	opts=n;
+	    	}
+	    	else{
+	    		opts[nextBucket++]=new Option(name, price);
+	    	}
+	    }
+	protected Option[] getOpts() {
 		return opts;
 	}
 
-	protected void setOpts(ArrayList<Option> opts) {
+	protected void setOpts(Option[] opts) {
 		this.opts = opts;
 	}
 

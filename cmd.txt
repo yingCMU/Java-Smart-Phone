@@ -1,0 +1,4 @@
+delete Transmission automatic
+delete Transmission newkey
+add Transmission newkey 299
+update Transmission automatic 299

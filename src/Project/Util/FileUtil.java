@@ -24,7 +24,7 @@ public class FileUtil {
 		 if(key.equals("#")){
 			 key = st.nextToken();
 			 int num = Integer.parseInt(st.nextToken());
-	        // System.out.println("#"+key+":"+num);
+	        //System.out.println("############"+key+":"+num);
 	        auto.addOptionSet(key, num);
 	        String set = key;
 	         for(int i=0; i < num; i++){

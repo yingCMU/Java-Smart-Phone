@@ -8,21 +8,31 @@ public class Automotive implements Serializable{ //This class will represent the
 	private String name;
 	private  int basePrice;
 	private final int DEFAUL_BASE_PRICE =  18445;
-	private ArrayList<OptionSet> opset ;
+	private OptionSet[] opset ;
+	
+	public void init(){
+		for(int i=0;i<opset.length;i++)
+			opset[i] = new OptionSet();
+			//for(int i=0;i<opt.length;i++)
+			//opt[i] = new Option();
+	}
 	public Automotive(int OptionSetsize, String name)	{
-	opset = new ArrayList<OptionSet>(OptionSetsize); 
+	opset = new OptionSet[OptionSetsize]; 
+	init();
 	setName(name);
 	basePrice = DEFAUL_BASE_PRICE;
 	}
 	public Automotive(String name,int baseprice, int OptionSetsize){
-		opset = new ArrayList<OptionSet>(OptionSetsize); 
+		opset = new OptionSet[OptionSetsize]; 
+		init();
 		setName(name);
 		basePrice = baseprice;
 	}
 	
 	
 	public Automotive() {
-		opset = new ArrayList<OptionSet>();
+		//opset = new OptionSet[1];
+		//init();*/
 		
 	}
 	public static void main(String[] args) {
@@ -32,29 +42,36 @@ public class Automotive implements Serializable{ //This class will represent the
 
 	 public void deleteOptSet(int i){
 	        try{
-	            opset.remove(i);
+	        	opsetRemove(i);
 	        } 
 	        catch (Exception e){
 	        	e.printStackTrace();
 	            System.err.printf("Error: %s", e);
 	        }
 	    }
+	 private void opsetRemove(int index){
+		 OptionSet[] n = new OptionSet[opset.length - 1];
+	        System.arraycopy(opset, index+1, n, index, opset.length - index-1);
+	        opset=n;
+	 }
 	/*
 	 * Find
 		i. Find OptionSet with name
 		ii. Find Option with name (in context of OptionSet)
 	 */
 	public OptionSet findSet(String name){
-		for(int i=0; i < opset.size();i++){
-            if(opset.get(i).getName().equalsIgnoreCase(name)){
-            	return opset.get(i);
+		if(opset.length==0)
+			return null;
+		for(int i=0; i < opset.length;i++){
+            if(opset[i].getName().equalsIgnoreCase(name)){
+            	return opset[i];
             }
 		}
         return  null;
 	}
 	public int findSetIndex(String name){
-		for(int i=0; i < opset.size();i++){
-            if(opset.get(i).getName().equalsIgnoreCase(name)){
+		for(int i=0; i < opset.length;i++){
+            if(opset[i].getName().equalsIgnoreCase(name)){
             	return i;
             }
 		}
@@ -66,10 +83,10 @@ public class Automotive implements Serializable{ //This class will represent the
 			System.err.println("no set "+setname +" found");
 			return null;
 		}
-		ArrayList<Option> ops = set.getOpts();
-		for(int i=0; i < ops.size();i++){
-            if(ops.get(i).getName().equalsIgnoreCase(optname)){
-            	return ops.get(i);
+		Option[] ops = set.getOpts();
+		for(int i=0; i < ops.length;i++){
+            if(ops[i].getName().equalsIgnoreCase(optname)){
+            	return ops[i];
             }
 		}
         return  null;
@@ -81,9 +98,9 @@ public class Automotive implements Serializable{ //This class will represent the
 			System.err.println("no set "+setname +" found");
 			return -1;
 		}
-		ArrayList<Option> ops = set.getOpts();
-		for(int i=0; i < ops.size();i++){
-            if(ops.get(i).getName().equalsIgnoreCase(optname)){
+		Option[] ops = set.getOpts();
+		for(int i=0; i < ops.length;i++){
+            if(ops[i].getName().equalsIgnoreCase(optname)){
             	return i;
             }
 		}
@@ -96,11 +113,18 @@ public class Automotive implements Serializable{ //This class will represent the
 			System.err.println("no set "+setname +" found");
 			return ;
 		}
-		ArrayList<Option> ops = set.getOpts();
-		for(int i=0; i < ops.size();i++){
-            if(ops.get(i).getName().equalsIgnoreCase(optname)){
-            	ops.remove(i);
-            	System.out.println(setname+"-"+optname+" removed");
+		
+		Option[] ops = set.getOpts();
+		for(int i=0; i < ops.length;i++){
+            if(ops[i].getName().equalsIgnoreCase(optname)){
+            	Option[] n = new Option[ops.length - 1];
+            	System.arraycopy(ops, 0, n, 0, ops.length -1);
+    	       System.arraycopy(ops, i+1, n, i, ops.length - i-1);
+            	//System.arraycopy(ops ,i+1,ops,i,ops .length-1-i);
+            	
+            	set.setOpts(n);
+            	System.out.println(setname+"-"+optname+" removed;\nsize:"+set.getOpts().length);
+            	
             	return ;
             }
 		}
@@ -135,16 +159,34 @@ public class Automotive implements Serializable{ //This class will represent the
 		this.basePrice = price;
 	}
 	public OptionSet getOpSet (int index){
-		if(index >=opset.size() || index <0)
+		if(index >=opset.length || index <0)
 			return null;
-		return opset.get(index);
+		return opset[index];
 		
 	}
-	 public void addOptionSet(String name, int numOfOptions){
-	        opset.add(new OptionSet(name, numOfOptions));
+	
+	 public void addOptionSet(String name, int numOfOptions)
+	    {   
+		 	if(opset==null){
+		 		opset= new OptionSet[ 1];
+		 		opset[0]=new OptionSet(name, numOfOptions);
+		 		return;
+		 	}
+	    	OptionSet[] n = new OptionSet[opset.length + 1];
+	    	System.arraycopy(opset, 0, n, 0, opset.length );
+	    	n[opset.length]=(new OptionSet(name, numOfOptions));
+	    	opset = n;
 	    }
 	 public void addOpt(String setName, String name, int price){
-	        findSet(setName).addOpt(name, price);
+	       OptionSet set = findSet(setName);
+	       if(set==null){
+	    	   System.err.println("set not found->"+setName);
+	    	   System.exit(1);
+	       }
+	       //System.err.println("set ->"+set);
+	       System.out.println("-: before add ,size now is "+set.getOpts().length);
+	        set.addOpt(name, price);
+	        System.out.println("add success size now is "+set.getOpts().length);
 	    }
 	 public void updateOpt(String setName, String optname, int price){
 	        OptionSet myset = findSet(setName);

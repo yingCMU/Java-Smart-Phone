@@ -17,8 +17,10 @@ public class Driver {
 
 	//Putting it altogether:
 	public static void main(String [] args){
-		String serOut= "./auto.data";
-		String input  ="./config" ;
+		//String serOut= "./auto.data";
+		String input = args[0];
+		//String input  ="./config" ;
+		String serOut = args[1];
 		Automotive auto = new Automotive();
 		 
 		objectSerializae(input, serOut,auto);
@@ -68,10 +70,11 @@ public class Driver {
 		inputReader = new BufferedReader(new InputStreamReader(System.in));
 		while(true) {
 			try {
-				System.out.println("to update or delete an option: \n" +
+				System.out.println("\n***********interaction console***********");
+				System.out.println("to update, add or delete an option: \n" +
 						"(1) update <optionSet> <optionName> <optionValue> or \n" +
 						"(2) add <optionSet> <optionName> <optionValue> or\n" +
-						"(2) add <optionSet> <optionName> "+
+						"(2) delete <optionSet> <optionName> "+
 						"(4) (Qq)uit");
 				System.out.print("$>");
 				input = inputReader.readLine();
@@ -83,6 +86,7 @@ public class Driver {
 		}
 	}
 
+	
 	public static void parseCommand(String input,Automotive auto) {
 		if (input == null) {
 			return;
@@ -98,7 +102,9 @@ public class Driver {
 				price= Integer.parseInt(tokens[3]);
 				}
 				catch( NumberFormatException e){
+					
 					System.err.println("Error: invalid value of price, should be a number ");
+					return;
 				}
 		}
 		if (tokens[0].equalsIgnoreCase("update") && tokens.length >= 4) 
