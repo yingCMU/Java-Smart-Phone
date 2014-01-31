@@ -184,9 +184,9 @@ public class Automotive implements Serializable{ //This class will represent the
 	    	   System.exit(1);
 	       }
 	       //System.err.println("set ->"+set);
-	       System.out.println("-: before add ,size now is "+set.getOpts().length);
+	       //System.out.println("-: before add ,size now is "+set.getOpts().length);
 	        set.addOpt(name, price);
-	        System.out.println("add success size now is "+set.getOpts().length);
+	        //System.out.println("add success size now is "+set.getOpts().length);
 	    }
 	 public void updateOpt(String setName, String optname, int price){
 	        OptionSet myset = findSet(setName);

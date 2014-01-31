@@ -33,7 +33,7 @@ class OptionSet implements Serializable{
 	protected void print() {
         System.out.println("Option :"+ name);
         for(Option o: opts){
-            System.out.println(o.toString());
+            o.print();
         }
     }
 	 protected void updateOpt(int i, String name, int price) {
@@ -81,8 +81,8 @@ class OptionSet implements Serializable{
 	    	n[opts.length]=(new Option(name, price));
 	    }
 	    protected void addOpt(String name, int price)
-	    {	System.out.println("--before addOpt next bucket is "+nextBucket);
-	    System.out.println("opts.length->"+opts.length);
+	    {	//System.out.println("--before addOpt next bucket is "+nextBucket);
+	    	//System.out.println("opts.length->"+opts.length);
 	    	if(nextBucket>=opts.length){
 	    	Option[] n = new Option[opts.length +1];
 	    	System.arraycopy(opts, 0, n, 0, opts.length );
@@ -147,8 +147,9 @@ class Option implements Serializable{
 	protected String getName() {
 		return name;
 	}
-	public String toString(){
-		return "["+name+","+price+"]";
+	
+	protected void print(){
+		System.out.println("["+name+","+price+"]");
 	}
 	protected void setName(String name) {
 		this.name = name;
