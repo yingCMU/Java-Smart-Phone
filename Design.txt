@@ -1,0 +1,13 @@
+Documentation
+¡ð The documentation is well written and clearly explains what the code is 
+accomplishing. Class Diagram is provided.
+this project is building a Car Configuration Application. The car model is constructed as a 
+Model.Automotive object.
+The Driver class is the entry point of application, it reads a text file to build 
+the base object model and archive it using Serialization and also deserialize from 
+an serializatiion file.
+a. Each Automotive model  has a set of OptionSet as properties (Color, Transmission etc.)
+b. Each OptionSet(property) has a set of Options( values and corresponsing price) 
+d. Model also has a price.
+e. class relations We can see that Model will contain OptionSet and Each OptionSet will contain Option class
+option class is inner class of optionset
