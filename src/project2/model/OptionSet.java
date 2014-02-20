@@ -24,10 +24,9 @@ class OptionSet implements Serializable{
 		opts= new  ArrayList<Option>(optssize); 
 		setName(name);
 	}
-	protected OptionSet(){
-		/*opts = new Option[DEFAULT_SIZE]; 
-		init();
-		setName("no_name_given");*/
+	protected OptionSet(String name){
+		opts= new  ArrayList<Option>(); 
+		setName(name);
 	}
 	protected void print() {
         System.out.println("Option :"+ name);

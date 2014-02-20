@@ -1,7 +1,12 @@
 package project2.model;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.util.ArrayList;
+
+
 
 import project2.exceptions.MissingChoiceException;
 import project2.exceptions.MissingOptionException;
@@ -42,6 +47,33 @@ public class Automobile implements Serializable{ //This class will represent the
 	public ArrayList<OptionSet> getOpset(){
 		return opset;
 	}
+	public void SetChoice(){
+			try{
+				System.out.println("\nThese are optionets, Please select one for each:");
+				BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+				for(OptionSet set:getOpset()){
+					System.out.print(set.getName()+": ");
+					String choice = stdIn.readLine().trim();
+				
+					setOptionChoice(set.getName(), choice);
+				}
+			System.out.println("!!!!total price: "+getTotalPrice());
+			}
+			catch (MissingSetException e) {
+				System.err.println(e.getMessage());
+				return;
+			} catch (MissingChoiceException e) {
+				System.err.println(e.getMessage());
+				return;
+			} catch (MissingOptionException e) {
+				System.err.println(e.getMessage());
+				return;
+				} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			}
+	
 	 public void deleteOptSet(int i){
 	        try{
 	        	opset.remove(i);
@@ -123,12 +155,12 @@ public class Automobile implements Serializable{ //This class will represent the
 		}
         throw new MissingOptionException("no option found for name-"+optname+" in set "+setname);
 	}
-	public float getTotalPrice() throws MissingOptionException{
+	public float getTotalPrice() throws MissingChoiceException{
 		float sum=0;
 		for(OptionSet set:opset){
 			Option choice = set.getChoice();
 			if(choice == null)
-				throw new MissingOptionException("no option set for set:"+set.getName());
+				throw new MissingChoiceException("no choice set for set:"+set.getName());
 			sum += choice.getPrice();
 		}
 		return sum+basePrice;
@@ -166,13 +198,13 @@ public class Automobile implements Serializable{ //This class will represent the
        System.out.println("remove failed");
 	}
 	
-	public float getBasePrice() {
+	public synchronized float getBasePrice() {
 		return basePrice;
 	}
-	public void setBasePrice(float price) {
+	public synchronized void setBasePrice(float price) {
 		this.basePrice = price;
 	}
-	public OptionSet getOpSet (int index){
+	public synchronized OptionSet getOpSet (int index){
 		if(index >=opset.size() || index <0)
 			return null;
 		return opset.get(index);
@@ -180,10 +212,13 @@ public class Automobile implements Serializable{ //This class will represent the
 		
 	}
 	
-	 public void addOptionSet(String name, int numOfOptions){   
+	 public synchronized void addOptionSet(String name, int numOfOptions){   
 		 opset.add(new OptionSet(name, numOfOptions));
 	 }
-	 public void addOpt(String setName, String name, float price){
+	 public synchronized void addOptionSet(String name){   
+		 opset.add(new OptionSet(name));
+	 }
+	 public synchronized void addOpt(String setName, String name, float price){
 	       OptionSet set = findSet(setName);
 	       if(set==null){
 	    	   System.err.println("set not found->"+setName);
@@ -194,7 +229,18 @@ public class Automobile implements Serializable{ //This class will represent the
 	        set.addOpt(name, price);
 	        //System.out.println("add success size now is "+set.getOpts().length);
 	    }
-	 public void updateOpt(String setName, String optname, float price) throws MissingSetException{
+	 public synchronized void addOpt(int setIndex, String name, float price){
+	       OptionSet set = opset.get(setIndex);
+	       if(set==null){
+	    	   System.err.println("set not found-> index :"+setIndex);
+	    	   System.exit(1);
+	       }
+	       //System.err.println("set ->"+set);
+	       //System.out.println("-: before add ,size now is "+set.getOpts().length);
+	        set.addOpt(name, price);
+	        //System.out.println("add success size now is "+set.getOpts().length);
+	    }
+	 public synchronized void updateOpt(String setName, String optname, float price) throws MissingSetException{
 	        OptionSet myset = findSet(setName);
 	        Option myopt = findOpt(setName,optname);//.addOpt(name, price);
 	        if(myopt == null){
@@ -204,14 +250,14 @@ public class Automobile implements Serializable{ //This class will represent the
 	        myopt.update(optname, price);
 	        System.out.println(optname+" updated->"+price);
 	 }
-	 public void updateOptSet(String setName,String newName) throws MissingSetException{
+	 public synchronized void updateOptSet(String setName,String newName) throws MissingSetException{
 		 OptionSet myset = findSet(setName);
 	        if(myset==null)
 	        	throw new MissingSetException("no set "+setName);
 	       
 	        myset.setName(newName);
 	 }
-	 public void print(){
+	 public  synchronized void print(){
 		 
 		 System.out.println("model :"+model+"\tbasePrice :"+basePrice);
 		 for(OptionSet os:opset){
@@ -219,7 +265,7 @@ public class Automobile implements Serializable{ //This class will represent the
 			 os.print();
 		 }
 	 }
-	public void updateOpt(String setName, String optname, String price) throws MissingSetException {
+	public synchronized void updateOpt(String setName, String optname, String price) throws MissingSetException {
 		// TODO Auto-generated method stub
 		try{
 		int p= Integer.parseInt(price);

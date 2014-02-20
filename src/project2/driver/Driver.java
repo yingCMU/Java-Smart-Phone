@@ -10,13 +10,9 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.StringTokenizer;
 
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.GnuParser;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
 
 import project2.Adapter.BuildAuto;
+import project2.exceptions.MissingChoiceException;
 import project2.exceptions.MissingModelException;
 import project2.exceptions.MissingOptionException;
 import project2.exceptions.MissingSetException;
@@ -24,6 +20,7 @@ import project2.model.Automobile;
 
 import project2.util.FileIO;
 import project2.util.FileUtil;
+import scale.EditOptions;
 
 
 
@@ -36,14 +33,19 @@ public class Driver {
 			System.err.println("invalid args\n usage java Driver <inputfile> <serialization_file>");
 			System.exit(0);
 		}*/
-		//String input = args[0];
-		String serOut= "./auto.data";
-		String input  ="./config" ;
-		//String serOut = args[1];
-		Automobile auto = new Automobile();
-		 
+		//Automobile auto = new Automobile();
+		try {
+			//testMultiThread();
+			
+			testMultiThread2();
+			
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		//objectSerializae(input, serOut,auto);
-		runApp(auto);
+		//runApp("./goodAuto");
+		//runApp(auto,"./autoNoPrice");
 	}
 
 	
@@ -69,56 +71,58 @@ public class Driver {
 			System.exit(1);
 		}
 	}
-	public static void runApp(Automobile auto) {
-		String input;
-		BufferedReader inputReader = null;
-		String filename="./config";
-		float price=10;
+	public static void testMultiThread2() throws InterruptedException{
+		/*
+		 * 
+		 */
+		String filename = "./goodAuto";
+		BuildAuto ba = new BuildAuto();
+		
+		ba.BuildAuto(filename);
+		
 		String model="Ford Focus Wagon ZTW";
-		String set= "Transmission";
-		String newset="Transmission";
+		String OptSet = "Transmission";
+		String newSetName1 ="T1set";
+		String newSetName2 ="T2set";
 		String opt="automatic";
-			try {
-				/* build auto from file*/
-				{
-					
-					BuildAuto ba = new BuildAuto();
-					
-					ba.BuildAuto(filename);
-					
-					}
-				
-				/* print auto */
-				{
-					BuildAuto ba = new BuildAuto();
-					ba.printAuto(model);
-					
-				}
-				{
-					BuildAuto ba = new BuildAuto();
-					//ba.updateOptionSetName(model,set,newset);
-				}
-				
-
-					//StringBuilder msg = new StringBuilder();
-				{
-					BuildAuto ba = new BuildAuto();
-					
-					ba.updateOptionPrice(model,set, opt, price);
-				
-					
-					//System.out.println("-m: "+cmd.getOptionValue('m')+"\n-s:"+cmd.getOptionValues("s")+"\n-o:"+cmd.getOptionValue("o")+"\n-p:"+cmd.getOptionValue("p"));
-				}
-				 testSetChoice("Ford Focus Wagon ZTW");
-				
-				
-				
-					
-			} catch (Exception e) {
-				e.printStackTrace();
-				System.exit(-1);
-			}
-		}
+		float newprice1=10;
+		float newprice2=20;
+		Thread thread1 = new Thread(new EditOptions(true,ba,model,OptSet,newSetName1,opt,newprice1)); 
+		thread1.start();
+		Thread.sleep(3000);
+		
+		Thread thread2 = new Thread(new EditOptions(false,ba,model,OptSet,newSetName2,opt,newprice2)); 
+		
+		thread2.start();
+		System.err.println("Thread2 is waiting for the lock of automobile,\n which is being held by thread 1, so thread 2 can not update the options");
+		
+		Thread.sleep(3000);
+		ba.printAuto(model);
+	}
+	public static void testMultiThread() throws InterruptedException{
+		/*
+		 * 
+		 */
+		String filename = "./goodAuto";
+		BuildAuto ba = new BuildAuto();
+		
+		ba.BuildAuto(filename);
+		
+		String model="Ford Focus Wagon ZTW";
+		String OptSet = "Power Moonroof";
+		String newSetName1 ="T1set";
+		String newSetName2 ="T2set";
+		String opt="selected";
+		float newprice1=100;
+		float newprice2=200;
+		Thread thread1 = new Thread(new EditOptions(false,ba,model,OptSet,newSetName1,opt,newprice1)); 
+		Thread thread2 = new Thread(new EditOptions(false,ba,model,OptSet,newSetName2,opt,newprice2)); 
+		thread1.start();
+		thread2.start();
+		System.out.println("tread sleeping for 2 sec");
+		Thread.sleep(2000);
+		ba.printAuto(model);
+	}
 	
 	static void testSetChoice(String model){
 		BuildAuto ba = new BuildAuto();
@@ -136,6 +140,9 @@ public class Driver {
 			return;
 			
 		} catch (MissingSetException e) {
+			System.err.println(e.getMessage());
+			return;
+		} catch (MissingChoiceException e) {
 			System.err.println(e.getMessage());
 			return;
 		} catch (MissingOptionException e) {
